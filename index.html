@@ -531,10 +531,11 @@
                     rival: "상대방",
                     heal: "회복",
                     btns: {
-                        chat: { name: "아무말", desc: "당기기 (++)" },
+                            chat: { name: "아무말", desc: "당기기 (++)" },
                         flatter: { name: "칭찬", desc: "슈퍼 당기기 (UP!)" },
-                        attack: { name: "비난", desc: "멘탈공격 / 당기기" },
-                        cry: { name: "슬픔", desc: "회복 / 조금 밀림" }
+                        attack: { name: "비난", desc: "멘탈공격 / 조금 당기기(+)" },
+                        cry: { name: "슬픔", desc: "회복 / 대신 양보(-)" }
+
                     }
                 },
                 turn: {
@@ -567,10 +568,10 @@
                     rival: "相手",
                     heal: "回復",
                     btns: {
-                        chat: { name: "雑談", desc: "引き寄せ (++)" },
-                        flatter: { name: "お世辞", desc: "超引き寄せ (UP!)" },
-                        attack: { name: "非難", desc: "攻撃 / 引き寄せ" },
-                        cry: { name: "泣く", desc: "回復 / 少し後退" }
+                     chat: { name: "無言", desc: "プル (++)" },
+ flatter: { name: "賞賛", desc: "スーパープル (UP!)" },
+ attack: { name: "非難", desc: "メンタル攻撃 / 少し引っ張る (+)" },
+ cry: { name: "悲しみ", desc: "回復/代わりに譲歩(-)" }
                     }
                 },
                 turn: {
@@ -704,7 +705,7 @@
         function calculateVariance(baseValue) {
             if (baseValue === 0) return 0;
             // -20% ~ +40% 범위의 랜덤 계수 (0.8 ~ 1.4)
-            const factor = 0.8 + (Math.random() * 0.6);
+            const factor = 0.8 + (Math.random() * 0.8);
             return {
                 value: Math.round(baseValue * factor),
                 factor: factor
@@ -716,7 +717,7 @@
 
             let cost = 0;
             if (type === 'chat') cost = 2;
-            else if (type === 'attack') cost = 10;
+            else if (type === 'attack') cost = 12;
             else if (type === 'cry') cost = 0;
 
             if (gameState.p1Hp < cost) {
@@ -786,7 +787,7 @@
                     break;
                 case 'flatter': 
                     baseCakeMove = isPlayer ? -28 : 28;
-                    baseEnemyHpChange = +10; // 적 회복 (변동)
+                    baseEnemyHpChange = +12; // 적 회복 (변동)
                     createEffect(isPlayer ? 'pc2-container' : 'pc1-container', '✨');
                     break;
                 case 'attack': 
