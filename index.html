@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cake Debate Battle</title>
+    <title>Cake Debate Battle - Balance Patch</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
@@ -359,7 +359,6 @@
 </head>
 <body>
 
-    <!-- 시작 화면 -->
     <div id="start-screen" class="modal">
         <h1>🍰 Cake Debate 🍰</h1>
         <p class="mb-8 text-xl text-gray-300">말로 상대를 제압하고 케이크를 차지하세요!</p>
@@ -367,41 +366,33 @@
         <button class="start-btn" onclick="startGame()">토론 시작</button>
     </div>
 
-    <!-- 게임 오버 화면 -->
     <div id="game-over-screen" class="modal hidden">
         <h1 id="result-title">Player Win!</h1>
         <p id="result-desc" class="mb-8 text-xl">케이크는 이제 제 겁니다.</p>
         <button class="start-btn" onclick="location.reload()">다시 하기</button>
     </div>
 
-    <!-- 인게임 씬 -->
     <div id="game-scene" class="game-scene">
         <div class="overlay"></div>
         <div class="table-surface"></div>
         <div class="center-line"></div>
 
-        <!-- 캐릭터 및 말풍선 (캐릭터 컨테이너 안에 말풍선을 포함시킴) -->
         <div id="pc1-container" class="character-container">
-            <!-- 말풍선 -->
             <div id="pc1-bubble" class="bubble-area">
                 <div class="bubble" id="p1-text">...</div>
             </div>
-            <!-- 캐릭터 이미지 -->
             <img id="img-pc1" src="pc1.png" class="character-img" alt="Player" 
                  onerror="handleImageError(this, 'pc1')">
         </div>
 
         <div id="pc2-container" class="character-container">
-            <!-- 말풍선 -->
             <div id="pc2-bubble" class="bubble-area">
                 <div class="bubble" id="p2-text">...</div>
             </div>
-            <!-- 캐릭터 이미지 -->
             <img id="img-pc2" src="pc2.png" class="character-img" alt="Rival" 
                  onerror="handleImageError(this, 'pc2')">
         </div>
 
-        <!-- 케이크 -->
         <div class="cake-track">
             <div id="cake-obj" class="cake-obj">
                 <img id="img-cake" src="cake.png" style="width:100%; border-radius:10px; border:2px solid white; box-shadow:0 4px 8px rgba(0,0,0,0.3);" alt="Cake"
@@ -410,10 +401,8 @@
             </div>
         </div>
 
-        <!-- 턴 알림 -->
         <div id="turn-indicator" class="turn-indicator">Player Turn</div>
 
-        <!-- UI 패널 -->
         <div class="ui-panel">
             <div class="status-bar">
                 <div class="hp-container">
@@ -439,28 +428,28 @@
 
             <div class="controls" id="controls">
                 <button class="btn-card" onclick="playerAction('chat')">
-                    <div class="btn-cost">MP 5</div>
+                    <div class="btn-cost">HP 2</div>
                     <div class="btn-icon">💬</div>
                     <div class="btn-text">아무말</div>
-                    <div class="text-xs text-gray-500 mt-1">당기기 (+)</div>
+                    <div class="text-xs text-gray-500 mt-1">당기기 (++)</div>
                 </button>
                 <button class="btn-card" onclick="playerAction('flatter')">
-                    <div class="btn-cost">MP 0</div>
+                     <div class="btn-cost">HP 0</div>
                     <div class="btn-icon">✨</div>
                     <div class="btn-text">칭찬</div>
-                    <div class="text-xs text-gray-500 mt-1">적 회복 / 강한 당기기 (*)</div>
+                    <div class="text-xs text-gray-500 mt-1">적 회복 / 슈퍼 당기기 (***)</div>
                 </button>
                 <button class="btn-card" onclick="playerAction('attack')">
-                    <div class="btn-cost">MP 15</div>
+                    <div class="btn-cost">HP 10</div>
                     <div class="btn-icon">💢</div>
                     <div class="btn-text">비난</div>
-                    <div class="text-xs text-gray-500 mt-1">적 멘탈 공격 (-)</div>
+                    <div class="text-xs text-gray-500 mt-1">적 멘탈 공격 / 조금 당기기</div>
                 </button>
                 <button class="btn-card" onclick="playerAction('cry')">
-                    <div class="btn-cost">MP 5</div>
+                    <div class="btn-cost">회복</div>
                     <div class="btn-icon">💧</div>
                     <div class="btn-text">슬픔</div>
-                    <div class="text-xs text-gray-500 mt-1">회복 / 케이크 양보 (/)</div>
+                    <div class="text-xs text-gray-500 mt-1">HP 대폭 회복 / 버티기</div>
                 </button>
             </div>
         </div>
@@ -529,7 +518,7 @@
             bgImg.onerror = function() {
                 const bgImgJpg = new Image();
                 bgImgJpg.onload = function() {
-                     gameScene.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.jpg')`;
+                      gameScene.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.jpg')`;
                 };
                 bgImgJpg.src = 'background.jpg';
             };
@@ -579,10 +568,11 @@
         function playerAction(type) {
             if (gameState.turn !== 'player' || gameState.isGameOver) return;
 
+            // 수정: 스킬 코스트 조정 (UI와 일치)
             let cost = 0;
-            if (type === 'chat') cost = 5;
-            else if (type === 'attack') cost = 15;
-            else if (type === 'cry') cost = 5;
+            if (type === 'chat') cost = 2; // 기존 5 -> 2
+            else if (type === 'attack') cost = 10; // 기존 15 -> 10
+            else if (type === 'cry') cost = 0; // 회복기는 코스트 0으로 처리
 
             if (gameState.p1Hp < cost) {
                 alert("멘탈이 부족합니다! 휴식(아무말/칭찬)이 필요합니다.");
@@ -603,6 +593,12 @@
             showTurnIndicator("상대방의 턴...");
 
             setTimeout(() => {
+                // 수정: AI가 죽어있으면 행동하지 않고 즉시 패배 체크
+                if (gameState.p2Hp <= 0) {
+                    checkWin();
+                    return;
+                }
+
                 let actionType = 'chat';
                 
                 if (gameState.p2Hp <= 20) actionType = 'cry';
@@ -613,11 +609,8 @@
                     actionType = actions[Math.floor(Math.random() * actions.length)];
                 }
 
-                if (gameState.p2Hp <= 0) {
-                    showBubble('pc2', "으으... (멘탈 붕괴)");
-                    gameState.p2Hp += 30; // 보너스 회복
-                }
-
+                // 수정: 좀비 부활 코드 삭제됨
+                
                 executeAction('ai', actionType);
 
                 if (!gameState.isGameOver) {
@@ -642,27 +635,32 @@
             let selfHpChange = 0;
             let enemyHpChange = 0;
 
+            // 수정: 밸런스 패치 적용
             switch(type) {
                 case 'chat': 
-                    cakeMove = isPlayer ? -10 : 10;
-                    selfHpChange = -5;
+                    // 당기기 강화 (10->12), 내 코스트 감소 (-5->-2)
+                    cakeMove = isPlayer ? -12 : 12;
+                    selfHpChange = -2;
                     break;
                 case 'flatter': 
-                    cakeMove = isPlayer ? -20 : 20;
-                    enemyHpChange = +15; 
+                    // 당기기 대폭 강화 (20->25), 적 회복량 감소 (+15->+10)
+                    cakeMove = isPlayer ? -25 : 25;
+                    enemyHpChange = +10; 
                     createEffect(isPlayer ? 'pc2-container' : 'pc1-container', '✨');
                     break;
                 case 'attack': 
-                    cakeMove = 0;
-                    enemyHpChange = -25;
-                    selfHpChange = -15;
+                    // 공격 시에도 케이크 당김 (0->5), 리스크 감소
+                    cakeMove = isPlayer ? -5 : 5;
+                    enemyHpChange = -20;
+                    selfHpChange = -10;
                     const victim = isPlayer ? document.getElementById('pc2-container') : document.getElementById('pc1-container');
                     victim.classList.add('shake');
                     setTimeout(() => victim.classList.remove('shake'), 500);
                     createEffect(isPlayer ? 'pc2-container' : 'pc1-container', '💢');
                     break;
                 case 'cry': 
-                    cakeMove = isPlayer ? 5 : -5;
+                    // 케이크 뺏기지 않고 버티기 (5->0), 회복량 유지
+                    cakeMove = 0;
                     selfHpChange = +30;
                     createEffect(isPlayer ? 'pc1-container' : 'pc2-container', '💧');
                     break;
@@ -688,7 +686,7 @@
 
             updateUI();
             
-            // 승리 조건 체크 (HP 0 이하 즉시 확인)
+            // 승리 조건 체크
             checkWin();
         }
 
@@ -700,9 +698,12 @@
             elP2HpText.innerText = Math.max(0, gameState.p2Hp);
 
             const btns = elControls.children;
-            if (gameState.p1Hp < 5) btns[0].disabled = true; else btns[0].disabled = false;
-            if (gameState.p1Hp < 15) btns[2].disabled = true; else btns[2].disabled = false;
-            if (gameState.p1Hp < 5) btns[3].disabled = true; else btns[3].disabled = false;
+            // 수정: 버튼 활성/비활성 조건을 변경된 코스트에 맞춤
+            if (gameState.p1Hp < 2) btns[0].disabled = true; else btns[0].disabled = false;
+            // flatter는 0코스트라 항상 활성화
+            if (gameState.p1Hp < 10) btns[2].disabled = true; else btns[2].disabled = false;
+            // cry는 회복기라 항상 활성화
+            btns[3].disabled = false; 
         }
 
         function disableControls(disabled) {
