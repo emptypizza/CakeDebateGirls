@@ -47,7 +47,7 @@
             z-index: 1;
         }
 
-        /* 캐릭터 */
+        /* 캐릭터 컨테이너 (위치 및 애니메이션 담당) */
         .character-container {
             position: absolute;
             bottom: 15%;
@@ -61,15 +61,20 @@
             justify-content: center;
         }
 
+        /* 캐릭터 이미지 (방향 담당) */
         .character-img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             object-position: bottom;
+            /* 중요: 두 캐릭터 모두 중앙을 보도록 좌우 반전 */
+            /* 원본 이미지가 바깥쪽을 보고 있다고 가정할 때 안쪽을 보게 함 */
+            transform: scaleX(-1); 
         }
 
         #pc1-container { left: 5%; }
-        #pc2-container { right: 5%; transform: scaleX(-1); }
+        /* 수정됨: 컨테이너 반전 제거 (이미지 자체에서 반전 처리) */
+        #pc2-container { right: 5%; } 
 
         /* 케이크 (줄다리기 대상) */
         .cake-track {
