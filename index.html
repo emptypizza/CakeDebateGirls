@@ -19,7 +19,6 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            /* 배경 이미지는 JS로 로드합니다 */
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             background-size: cover;
             background-position: center;
@@ -34,7 +33,6 @@
             pointer-events: none;
         }
 
-        /* 테이블 느낌을 위한 하단 그라데이션 */
         .table-surface {
             position: absolute;
             bottom: 0;
@@ -47,7 +45,7 @@
             z-index: 1;
         }
 
-        /* 캐릭터 컨테이너 (위치 및 애니메이션 담당) */
+        /* 캐릭터 */
         .character-container {
             position: absolute;
             bottom: 15%;
@@ -61,22 +59,18 @@
             justify-content: center;
         }
 
-        /* 캐릭터 이미지 (방향 담당) */
         .character-img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             object-position: bottom;
-            /* 중요: 두 캐릭터 모두 중앙을 보도록 좌우 반전 */
-            /* 원본 이미지가 바깥쪽을 보고 있다고 가정할 때 안쪽을 보게 함 */
-            transform: scaleX(-1); 
+            transform: scaleX(-1); /* 서로 마주보게 반전 */
         }
 
         #pc1-container { left: 5%; }
-        /* 수정됨: 컨테이너 반전 제거 (이미지 자체에서 반전 처리) */
-        #pc2-container { right: 5%; } 
+        #pc2-container { right: 5%; }
 
-        /* 케이크 (줄다리기 대상) */
+        /* 케이크 */
         .cake-track {
             position: absolute;
             bottom: 25%;
@@ -91,7 +85,7 @@
         .cake-obj {
             position: absolute;
             top: -100px;
-            left: 50%; /* JS로 제어 */
+            left: 50%;
             transform: translateX(-50%);
             width: 18vh;
             height: auto;
@@ -100,15 +94,16 @@
             z-index: 4;
         }
 
-        /* 말풍선 */
+        /* 말풍선 스타일 개선 */
         .bubble-area {
             position: absolute;
             top: 15%;
-            width: 300px;
-            z-index: 10;
+            width: 320px;
+            z-index: 50; /* Z-index 높임 */
             opacity: 0;
-            transition: all 0.4s ease;
-            transform: scale(0.8);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scale(0.9);
+            pointer-events: none; /* 클릭 방해 금지 */
         }
 
         .bubble {
@@ -117,35 +112,48 @@
             border-radius: 20px;
             border: 3px solid #000;
             font-family: 'Jua', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             line-height: 1.4;
             color: #333;
             box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
             position: relative;
+            word-break: keep-all; /* 단어 단위 줄바꿈 */
         }
 
-        #pc1-bubble { left: 10%; }
-        #pc2-bubble { right: 10%; }
+        #pc1-bubble { left: 15%; }
+        #pc2-bubble { right: 15%; }
 
         .bubble::after {
             content: '';
             position: absolute;
-            bottom: -15px;
+            bottom: -20px;
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 15px solid #000;
+            border-width: 20px 15px 0;
+            border-style: solid;
+            border-color: #000 transparent transparent transparent;
         }
-        #pc1-bubble .bubble::after { left: 20%; }
-        #pc2-bubble .bubble::after { right: 20%; }
+        .bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            width: 0;
+            height: 0;
+            border-width: 20px 15px 0;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+            z-index: 1;
+        }
+
+        #pc1-bubble .bubble::after, #pc1-bubble .bubble::before { left: 20%; }
+        #pc2-bubble .bubble::after, #pc2-bubble .bubble::before { right: 20%; }
 
         .bubble.active {
-            opacity: 1;
+            opacity: 1 !important;
             transform: scale(1) translateY(-10px);
         }
 
-        /* UI 패널 (하단) */
+        /* UI 패널 */
         .ui-panel {
             position: absolute;
             bottom: 0;
@@ -247,7 +255,6 @@
             font-weight: bold; 
         }
 
-        /* 턴 표시기 */
         .turn-indicator {
             position: absolute;
             top: 50%;
@@ -267,7 +274,6 @@
             border: 2px solid white;
         }
 
-        /* 애니메이션 효과 */
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
@@ -290,7 +296,6 @@
         }
         .pop { animation: pop 0.2s; }
 
-        /* 시작/종료 화면 */
         .modal {
             position: fixed;
             inset: 0;
@@ -316,10 +321,8 @@
             transition: transform 0.1s;
         }
         .start-btn:active { transform: translateY(6px); box-shadow: none; }
-        
         .hidden { display: none !important; }
 
-        /* 승리선 (중앙 점선 등) */
         .center-line {
             position: absolute;
             left: 50%;
@@ -345,7 +348,6 @@
             0% { transform: translateY(0) scale(1); opacity: 1; }
             100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
         }
-
     </style>
 </head>
 <body>
@@ -354,6 +356,7 @@
     <div id="start-screen" class="modal">
         <h1>🍰 Cake Debate 🍰</h1>
         <p class="mb-8 text-xl text-gray-300">말로 상대를 제압하고 케이크를 차지하세요!</p>
+        <p class="mb-8 text-md text-gray-400">사운드가 재생됩니다. 볼륨을 조절해주세요.</p>
         <button class="start-btn" onclick="startGame()">토론 시작</button>
     </div>
 
@@ -372,17 +375,15 @@
 
         <!-- 캐릭터 -->
         <div id="pc1-container" class="character-container">
-            <!-- 1. 먼저 pc1.png 시도, 실패하면 pc1.jpg 시도 -->
             <img id="img-pc1" src="pc1.png" class="character-img" alt="Player" 
                  onerror="handleImageError(this, 'pc1')">
         </div>
         <div id="pc2-container" class="character-container">
-            <!-- 1. 먼저 pc2.png 시도, 실패하면 pc2.jpg 시도 -->
             <img id="img-pc2" src="pc2.png" class="character-img" alt="Rival" 
                  onerror="handleImageError(this, 'pc2')">
         </div>
 
-        <!-- 말풍선 -->
+        <!-- 말풍선 (ID 수정 및 스타일 적용 확인) -->
         <div id="pc1-bubble" class="bubble-area">
             <div class="bubble" id="p1-text">...</div>
         </div>
@@ -393,7 +394,6 @@
         <!-- 케이크 -->
         <div class="cake-track">
             <div id="cake-obj" class="cake-obj">
-                <!-- 1. 먼저 cake.png 시도, 실패하면 cake.jpg 시도 -->
                 <img id="img-cake" src="cake.png" style="width:100%; border-radius:10px; border:2px solid white; box-shadow:0 4px 8px rgba(0,0,0,0.3);" alt="Cake"
                      onerror="handleImageError(this, 'cake')">
                 <div class="absolute -bottom-6 w-full text-center text-white font-bold drop-shadow-md">TARGET</div>
@@ -405,8 +405,6 @@
 
         <!-- UI 패널 -->
         <div class="ui-panel">
-            
-            <!-- 상태창 (HP) -->
             <div class="status-bar">
                 <div class="hp-container">
                     <div class="hp-label">
@@ -429,33 +427,25 @@
                 </div>
             </div>
 
-            <!-- 컨트롤 버튼 -->
             <div class="controls" id="controls">
-                <!-- 버튼 1: 아무말 (Pull) -->
                 <button class="btn-card" onclick="playerAction('chat')">
                     <div class="btn-cost">MP 5</div>
                     <div class="btn-icon">💬</div>
                     <div class="btn-text">아무말</div>
                     <div class="text-xs text-gray-500 mt-1">당기기 (+)</div>
                 </button>
-
-                <!-- 버튼 2: 칭찬 (Burst) -->
                 <button class="btn-card" onclick="playerAction('flatter')">
                     <div class="btn-cost">MP 0</div>
                     <div class="btn-icon">✨</div>
                     <div class="btn-text">칭찬</div>
                     <div class="text-xs text-gray-500 mt-1">적 회복 / 강한 당기기 (*)</div>
                 </button>
-
-                <!-- 버튼 3: 비난 (Attack) -->
                 <button class="btn-card" onclick="playerAction('attack')">
                     <div class="btn-cost">MP 15</div>
                     <div class="btn-icon">💢</div>
                     <div class="btn-text">비난</div>
                     <div class="text-xs text-gray-500 mt-1">적 멘탈 공격 (-)</div>
                 </button>
-
-                <!-- 버튼 4: 슬픔 (Heal/Yield) -->
                 <button class="btn-card" onclick="playerAction('cry')">
                     <div class="btn-cost">MP 5</div>
                     <div class="btn-icon">💧</div>
@@ -467,11 +457,48 @@
     </div>
 
     <script>
-        // 이미지 로딩 오류 처리기 (png 실패 -> jpg 시도 -> placeholder)
+        // --- 사운드 시스템 (Web Audio API) ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        const sounds = {
+            chat: { type: 'sine', freq: [500, 600], duration: 0.1 },
+            flatter: { type: 'triangle', freq: [400, 600, 800], duration: 0.15 }, // Arpeggio like
+            attack: { type: 'sawtooth', freq: [150, 100], duration: 0.2 },
+            cry: { type: 'sine', freq: [400, 300], duration: 0.4 },
+            win: { type: 'square', freq: [523, 659, 784, 1046], duration: 0.15 },
+            lose: { type: 'sawtooth', freq: [300, 250, 200, 150], duration: 0.3 }
+        };
+
+        function playSound(name) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const config = sounds[name];
+            if (!config) return;
+
+            let startTime = audioCtx.currentTime;
+            
+            config.freq.forEach((f, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = config.type;
+                osc.frequency.setValueAtTime(f, startTime + i * 0.1);
+                
+                gain.gain.setValueAtTime(0.1, startTime + i * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + i * 0.1 + config.duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(startTime + i * 0.1);
+                osc.stop(startTime + i * 0.1 + config.duration);
+            });
+        }
+
+        // 이미지 로딩 오류 처리
         function handleImageError(img, name) {
-            // 이미 재시도했는지 확인 (무한 루프 방지)
             if (img.dataset.retried === "true") {
-                // jpg도 실패하면 플레이스홀더 표시
                 let color = '808080';
                 if(name === 'pc1') color = 'FFB6C1';
                 if(name === 'pc2') color = 'ADD8E6';
@@ -479,24 +506,17 @@
                 img.src = `https://placehold.co/200x400/${color}/white?text=${name}`;
                 return;
             }
-
-            // jpg로 확장자 변경해서 재시도
             img.dataset.retried = "true";
             img.src = name + ".jpg";
-            console.log(`Retrying ${name} with .jpg extension...`);
         }
 
-        // 배경 이미지 로드 시도
         function loadBackground() {
             const gameScene = document.getElementById('game-scene');
             const bgImg = new Image();
-            
-            // 먼저 png 시도
             bgImg.onload = function() {
                 gameScene.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.png')`;
             };
             bgImg.onerror = function() {
-                // png 실패 시 jpg 시도
                 const bgImgJpg = new Image();
                 bgImgJpg.onload = function() {
                      gameScene.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.jpg')`;
@@ -505,57 +525,26 @@
             };
             bgImg.src = 'background.png';
         }
-
-        // 초기 실행
         window.addEventListener('load', loadBackground);
-
 
         // 게임 설정
         const MAX_HP = 100;
-        const CAKE_MAX_POS = 100; // 0 = Player, 100 = Rival
         let gameState = {
             p1Hp: 100,
             p2Hp: 100,
             cakePos: 50,
-            turn: 'player', // 'player' or 'ai'
+            turn: 'player',
             isGameOver: false
         };
 
-        // 대사 데이터베이스
         const dialogues = {
-            chat: [
-                "오늘 날씨가 참 좋지 않아?",
-                "너 그 머리핀, 어디서 샀어?",
-                "케이크엔 역시 아메리카노지.",
-                "근데 너 숙제는 다 했니?"
-            ],
-            flatter: [
-                "넌 웃을 때가 제일 예뻐!",
-                "너처럼 똑똑한 애는 처음 봐.",
-                "역시 넌 배려심이 깊구나.",
-                "오늘 스타일 완전 아이돌 같아!"
-            ],
-            attack: [
-                "너 진짜 이기적이다.",
-                "양심이 있으면 좀 비켜줄래?",
-                "말이 안 통하네 정말.",
-                "너 친구 없지?"
-            ],
-            cry: [
-                "나 요즘 너무 힘들어...",
-                "오늘 하루만 양보해주면 안 돼?",
-                "흑흑... 당 떨어져서 그래...",
-                "내가 불쌍하지도 않아?"
-            ],
-            stun: [
-                "머리가 멍해...",
-                "말문이 막혔어...",
-                "너무해...",
-                "..."
-            ]
+            chat: ["오늘 날씨가 참 좋지 않아?", "너 그 머리핀, 어디서 샀어?", "케이크엔 역시 아메리카노지.", "근데 너 숙제는 다 했니?"],
+            flatter: ["넌 웃을 때가 제일 예뻐!", "너처럼 똑똑한 애는 처음 봐.", "역시 넌 배려심이 깊구나.", "오늘 스타일 완전 아이돌 같아!"],
+            attack: ["너 진짜 이기적이다.", "양심이 있으면 좀 비켜줄래?", "말이 안 통하네 정말.", "너 친구 없지?"],
+            cry: ["나 요즘 너무 힘들어...", "오늘 하루만 양보해주면 안 돼?", "흑흑... 당 떨어져서 그래...", "내가 불쌍하지도 않아?"],
+            stun: ["머리가 멍해...", "말문이 막혔어...", "너무해...", "..."]
         };
 
-        // DOM 요소
         const elCake = document.getElementById('cake-obj');
         const elP1Hp = document.getElementById('p1-hp');
         const elP2Hp = document.getElementById('p2-hp');
@@ -566,24 +555,20 @@
         
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             updateUI();
             showTurnIndicator("당신의 턴!");
         }
 
-        // 턴 알림 표시
         function showTurnIndicator(text) {
             elTurnIndicator.innerText = text;
             elTurnIndicator.style.opacity = 1;
-            setTimeout(() => {
-                elTurnIndicator.style.opacity = 0;
-            }, 1000);
+            setTimeout(() => { elTurnIndicator.style.opacity = 0; }, 1000);
         }
 
-        // 플레이어 액션
         function playerAction(type) {
             if (gameState.turn !== 'player' || gameState.isGameOver) return;
 
-            // 비용 확인
             let cost = 0;
             if (type === 'chat') cost = 5;
             else if (type === 'attack') cost = 15;
@@ -594,10 +579,8 @@
                 return;
             }
 
-            // 액션 실행
             executeAction('player', type);
             
-            // 턴 넘기기
             if (!gameState.isGameOver) {
                 gameState.turn = 'ai';
                 disableControls(true);
@@ -605,43 +588,25 @@
             }
         }
 
-        // AI 턴 로직
         function aiTurn() {
             if (gameState.isGameOver) return;
             showTurnIndicator("상대방의 턴...");
 
-            // AI 생각 시간 연출
             setTimeout(() => {
-                // AI 로직:
-                // 1. HP가 20 이하면 'cry' (회복)
-                // 2. 케이크가 20 이하(뺏길 위기)면 'flatter' (강한 당기기)
-                // 3. 상대 HP가 높으면 'attack'
-                // 4. 그 외 랜덤
                 let actionType = 'chat';
                 
-                if (gameState.p2Hp <= 20) {
-                    actionType = 'cry';
-                } else if (gameState.cakePos <= 30) {
-                    actionType = 'flatter';
-                } else if (gameState.p1Hp > 50 && Math.random() > 0.5) {
-                    actionType = 'attack';
-                } else {
+                if (gameState.p2Hp <= 20) actionType = 'cry';
+                else if (gameState.cakePos <= 30) actionType = 'flatter';
+                else if (gameState.p1Hp > 50 && Math.random() > 0.5) actionType = 'attack';
+                else {
                     const actions = ['chat', 'flatter', 'attack'];
                     actionType = actions[Math.floor(Math.random() * actions.length)];
                 }
 
-                // AI가 기절 상태(HP 0)라면 턴 스킵
                 if (gameState.p2Hp <= 0) {
-                    showBubble('pc2', "으으... (멘탈 붕괴)"); // ID 수정: p2 -> pc2
-                    // 약간의 회복
-                    gameState.p2Hp += 30;
-                    updateUI();
-                    setTimeout(() => {
-                        gameState.turn = 'player';
-                        disableControls(false);
-                        showTurnIndicator("당신의 턴!");
-                    }, 1500);
-                    return;
+                    showBubble('pc2', "으으... (멘탈 붕괴)");
+                    gameState.p2Hp += 30; // 보너스 회복? 혹은 게임 오버? (현재 룰은 0이하면 패배이므로 이 로직 도달하기 전에 패배 처리됨. 하지만 예외 처리)
+                    // 승리 조건 체크가 executeAction에서 일어나므로 여기서는 그냥 둠
                 }
 
                 executeAction('ai', actionType);
@@ -654,50 +619,46 @@
             }, 1000);
         }
 
-        // 액션 실행 공통 함수
         function executeAction(actor, type) {
             const isPlayer = actor === 'player';
             const target = isPlayer ? 'ai' : 'player';
             
-            // 1. 대사 출력
+            // 사운드 재생
+            playSound(type);
+
             const msg = dialogues[type][Math.floor(Math.random() * dialogues[type].length)];
-            // ID 수정: p1 -> pc1, p2 -> pc2
             showBubble(isPlayer ? 'pc1' : 'pc2', msg);
 
-            // 2. 효과 적용
             let cakeMove = 0;
             let selfHpChange = 0;
             let enemyHpChange = 0;
 
             switch(type) {
-                case 'chat': // 아무말: 소량 당기기, 소량 소모
+                case 'chat': 
                     cakeMove = isPlayer ? -10 : 10;
                     selfHpChange = -5;
                     break;
-                case 'flatter': // 칭찬: 많이 당기기, 적 회복
+                case 'flatter': 
                     cakeMove = isPlayer ? -20 : 20;
                     enemyHpChange = +15; 
-                    // 칭찬 효과: 반짝임
                     createEffect(isPlayer ? 'pc2-container' : 'pc1-container', '✨');
                     break;
-                case 'attack': // 비난: 케이크 이동 없음, 적 데미지
+                case 'attack': 
                     cakeMove = 0;
                     enemyHpChange = -25;
                     selfHpChange = -15;
-                    // 공격 효과: 흔들림
                     const victim = isPlayer ? document.getElementById('pc2-container') : document.getElementById('pc1-container');
                     victim.classList.add('shake');
                     setTimeout(() => victim.classList.remove('shake'), 500);
                     createEffect(isPlayer ? 'pc2-container' : 'pc1-container', '💢');
                     break;
-                case 'cry': // 슬픔: 회복, 케이크 조금 양보
+                case 'cry': 
                     cakeMove = isPlayer ? 5 : -5;
                     selfHpChange = +30;
                     createEffect(isPlayer ? 'pc1-container' : 'pc2-container', '💧');
                     break;
             }
 
-            // 상태 업데이트
             if (isPlayer) {
                 gameState.p1Hp += selfHpChange;
                 gameState.p2Hp += enemyHpChange;
@@ -706,39 +667,33 @@
                 gameState.p1Hp += enemyHpChange;
             }
             
-            // HP 범위 제한
-            gameState.p1Hp = Math.max(0, Math.min(100, gameState.p1Hp));
-            gameState.p2Hp = Math.max(0, Math.min(100, gameState.p2Hp));
+            // HP 상한 제한
+            gameState.p1Hp = Math.min(100, gameState.p1Hp);
+            gameState.p2Hp = Math.min(100, gameState.p2Hp);
             
-            // 케이크 이동
             gameState.cakePos += cakeMove;
             gameState.cakePos = Math.max(0, Math.min(100, gameState.cakePos));
 
-            // 데미지 텍스트 표시
             if (enemyHpChange < 0) showDamage(target, enemyHpChange);
             if (selfHpChange < 0) showDamage(actor, selfHpChange);
 
             updateUI();
+            
+            // 승리 조건 체크 (HP 0 이하 즉시 확인)
             checkWin();
         }
 
-        // UI 업데이트
         function updateUI() {
-            // 케이크 위치
             elCake.style.left = `${gameState.cakePos}%`;
-            
-            // HP 바
-            elP1Hp.style.width = `${gameState.p1Hp}%`;
-            elP2Hp.style.width = `${gameState.p2Hp}%`;
-            elP1HpText.innerText = gameState.p1Hp;
-            elP2HpText.innerText = gameState.p2Hp;
+            elP1Hp.style.width = `${Math.max(0, gameState.p1Hp)}%`;
+            elP2Hp.style.width = `${Math.max(0, gameState.p2Hp)}%`;
+            elP1HpText.innerText = Math.max(0, gameState.p1Hp);
+            elP2HpText.innerText = Math.max(0, gameState.p2Hp);
 
-            // 버튼 상태 (MP 부족시 비활성화)
             const btns = elControls.children;
-            if (gameState.p1Hp < 5) btns[0].disabled = true; else btns[0].disabled = false; // chat
-            // flatter 0 cost always active
-            if (gameState.p1Hp < 15) btns[2].disabled = true; else btns[2].disabled = false; // attack
-            if (gameState.p1Hp < 5) btns[3].disabled = true; else btns[3].disabled = false; // cry
+            if (gameState.p1Hp < 5) btns[0].disabled = true; else btns[0].disabled = false;
+            if (gameState.p1Hp < 15) btns[2].disabled = true; else btns[2].disabled = false;
+            if (gameState.p1Hp < 5) btns[3].disabled = true; else btns[3].disabled = false;
         }
 
         function disableControls(disabled) {
@@ -746,35 +701,46 @@
             btns.forEach(btn => btn.disabled = disabled);
         }
 
-        // 말풍선 표시
         function showBubble(who, text) {
+            // 말풍선 ID 확인: pc1 -> pc1-bubble, pc2 -> pc2-bubble
             const bubbleArea = document.getElementById(`${who}-bubble`);
-            // ID 로직 수정: who가 pc1이면 p1-text, 아니면 p2-text
+            // 텍스트 ID 확인: pc1 -> p1-text, pc2 -> p2-text
             const bubbleText = document.getElementById(who === 'pc1' ? 'p1-text' : 'p2-text');
             
+            if (!bubbleArea || !bubbleText) {
+                console.error("Bubble element not found:", who);
+                return;
+            }
+
             bubbleText.innerText = text;
+            
+            // 기존 active 클래스 제거 후 다시 추가하여 애니메이션 리셋 효과
+            bubbleArea.classList.remove('active');
+            void bubbleArea.offsetWidth; // Trigger reflow
             bubbleArea.classList.add('active');
             
-            // 캐릭터 팝 효과
             const char = document.getElementById(`${who}-container`);
-            char.classList.add('pop');
-            setTimeout(() => char.classList.remove('pop'), 200);
+            if(char) {
+                char.classList.add('pop');
+                setTimeout(() => char.classList.remove('pop'), 200);
+            }
 
-            // 3초 후 사라짐
+            // 턴이 바뀌거나 일정 시간 후 사라짐
             setTimeout(() => {
-                if(gameState.turn !== (who==='pc1'?'player':'ai')) // 턴이 바뀌었으면 끔 (ID 수정)
-                   bubbleArea.classList.remove('active');
+                // 현재 턴이 아닌 사람의 말풍선은 닫음
+                // if ((who === 'pc1' && gameState.turn === 'ai') || (who === 'pc2' && gameState.turn === 'player')) {
+                    bubbleArea.classList.remove('active');
+                // }
             }, 2500);
         }
 
-        // 데미지 텍스트
         function showDamage(who, amount) {
             const el = document.createElement('div');
             el.className = 'damage-text';
             el.innerText = amount;
             const container = document.getElementById(who === 'player' ? 'pc1-container' : 'pc2-container');
-            
-            // 위치 랜덤 조정
+            if(!container) return;
+
             const rect = container.getBoundingClientRect();
             el.style.left = (rect.left + rect.width/2) + 'px';
             el.style.top = (rect.top + 50) + 'px';
@@ -783,7 +749,6 @@
             setTimeout(() => el.remove(), 1000);
         }
 
-        // 이펙트 생성
         function createEffect(targetId, emoji) {
             const el = document.createElement('div');
             el.style.position = 'absolute';
@@ -793,6 +758,7 @@
             el.innerText = emoji;
             
             const target = document.getElementById(targetId);
+            if(!target) return;
             const rect = target.getBoundingClientRect();
             el.style.left = (rect.left + rect.width/2 - 20) + 'px';
             el.style.top = (rect.top) + 'px';
@@ -801,16 +767,40 @@
             setTimeout(() => el.remove(), 1000);
         }
 
-        // 승리 체크
+        // 승리 체크 (수정된 로직: 멘탈 0 이하 or 케이크 끝까지 도달)
         function checkWin() {
-            if (gameState.cakePos <= 0) {
-                gameOver(true);
+            let gameOver = false;
+            let playerWin = false;
+
+            // 1. 멘탈 HP 체크 (0 이하 발생 시)
+            if (gameState.p1Hp <= 0 || gameState.p2Hp <= 0) {
+                gameOver = true;
+                // 둘 다 0이하면 더 높은 쪽 승리 (또는 무승부 처리 가능하나 여기선 Player 우선)
+                if (gameState.p1Hp > gameState.p2Hp) {
+                    playerWin = true;
+                } else if (gameState.p2Hp > gameState.p1Hp) {
+                    playerWin = false;
+                } else {
+                    // 동점일 경우 케이크 위치로 판별
+                    playerWin = gameState.cakePos < 50;
+                }
+            }
+            // 2. 케이크 위치 체크 (기존 룰 유지)
+            else if (gameState.cakePos <= 0) {
+                gameOver = true;
+                playerWin = true;
             } else if (gameState.cakePos >= 100) {
-                gameOver(false);
+                gameOver = true;
+                playerWin = false;
+            }
+
+            if (gameOver) {
+                playSound(playerWin ? 'win' : 'lose');
+                finishGame(playerWin);
             }
         }
 
-        function gameOver(playerWin) {
+        function finishGame(playerWin) {
             gameState.isGameOver = true;
             const screen = document.getElementById('game-over-screen');
             const title = document.getElementById('result-title');
@@ -820,15 +810,14 @@
             if (playerWin) {
                 title.innerText = "🎉 YOU WIN! 🎉";
                 title.style.color = "#ff4757";
-                desc.innerText = "당신의 말빨로 케이크를 쟁취했습니다!";
+                desc.innerText = "상대의 멘탈을 부수고 케이크를 쟁취했습니다!";
             } else {
                 title.innerText = "😭 YOU LOSE... 😭";
                 title.style.color = "#5352ed";
-                desc.innerText = "케이크를 뺏겼습니다... 다음에 다시 도전하세요.";
+                desc.innerText = "멘탈이 바닥났습니다... 케이크는 저 멀리...";
             }
         }
 
-        // 초기화
         updateUI();
     </script>
 </body>
