@@ -19,8 +19,8 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            /* 배경 이미지가 없을 경우를 대비한 따뜻한 카페 색상 그라데이션 */
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.jpg'), linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            /* 수정됨: background.jpg -> background.png */
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.png'), linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             background-size: cover;
             background-position: center;
             overflow: hidden;
@@ -70,9 +70,6 @@
 
         #pc1-container { left: 5%; }
         #pc2-container { right: 5%; transform: scaleX(-1); }
-
-        /* 라이벌 이미지 내의 텍스트가 반전되지 않도록 내부 이미지 역반전 (선택사항) */
-        /* #pc2-container .character-img { transform: scaleX(-1); } */
 
         /* 케이크 (줄다리기 대상) */
         .cake-track {
@@ -368,13 +365,15 @@
         <div class="table-surface"></div>
         <div class="center-line"></div>
 
-        <!-- 캐릭터: 이미지 로드 실패 시 대체 이미지(Placeholder) 사용 -->
+        <!-- 캐릭터 -->
         <div id="pc1-container" class="character-container">
-            <img src="pc1.jpg" class="character-img" alt="Player" 
+            <!-- 수정됨: pc1.jpg -> pc1.png -->
+            <img src="pc1.png" class="character-img" alt="Player" 
                  onerror="this.src='https://placehold.co/200x400/FFB6C1/white?text=Me';">
         </div>
         <div id="pc2-container" class="character-container">
-            <img src="pc2.jpg" class="character-img" alt="Rival" 
+            <!-- 수정됨: pc2.jpg -> pc2.png -->
+            <img src="pc2.png" class="character-img" alt="Rival" 
                  onerror="this.src='https://placehold.co/200x400/ADD8E6/white?text=Rival';">
         </div>
 
@@ -386,10 +385,11 @@
             <div class="bubble" id="p2-text">...</div>
         </div>
 
-        <!-- 케이크: 이미지 로드 실패 시 대체 이미지 사용 -->
+        <!-- 케이크 -->
         <div class="cake-track">
             <div id="cake-obj" class="cake-obj">
-                <img src="cake.jpg" style="width:100%; border-radius:10px; border:2px solid white; box-shadow:0 4px 8px rgba(0,0,0,0.3);" alt="Cake"
+                <!-- 수정됨: cake.jpg -> cake.png -->
+                <img src="cake.png" style="width:100%; border-radius:10px; border:2px solid white; box-shadow:0 4px 8px rgba(0,0,0,0.3);" alt="Cake"
                      onerror="this.src='https://placehold.co/100x100/8B4513/white?text=Cake';">
                 <div class="absolute -bottom-6 w-full text-center text-white font-bold drop-shadow-md">TARGET</div>
             </div>
