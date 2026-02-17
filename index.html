@@ -19,11 +19,12 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            /* 수정됨: background.jpg -> background.png */
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.png'), linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            /* 배경 이미지는 JS로 로드합니다 */
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             background-size: cover;
             background-position: center;
             overflow: hidden;
+            transition: background-image 0.5s ease;
         }
 
         .overlay {
@@ -55,7 +56,6 @@
             z-index: 2;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-            /* 이미지가 깨졌을 때 레이아웃 유지를 위한 설정 */
             display: flex;
             align-items: flex-end;
             justify-content: center;
@@ -360,21 +360,21 @@
     </div>
 
     <!-- 인게임 씬 -->
-    <div class="game-scene">
+    <div id="game-scene" class="game-scene">
         <div class="overlay"></div>
         <div class="table-surface"></div>
         <div class="center-line"></div>
 
         <!-- 캐릭터 -->
         <div id="pc1-container" class="character-container">
-            <!-- 수정됨: pc1.jpg -> pc1.png -->
-            <img src="pc1.png" class="character-img" alt="Player" 
-                 onerror="this.src='https://placehold.co/200x400/FFB6C1/white?text=Me';">
+            <!-- 1. 먼저 pc1.png 시도, 실패하면 pc1.jpg 시도 -->
+            <img id="img-pc1" src="pc1.png" class="character-img" alt="Player" 
+                 onerror="handleImageError(this, 'pc1')">
         </div>
         <div id="pc2-container" class="character-container">
-            <!-- 수정됨: pc2.jpg -> pc2.png -->
-            <img src="pc2.png" class="character-img" alt="Rival" 
-                 onerror="this.src='https://placehold.co/200x400/ADD8E6/white?text=Rival';">
+            <!-- 1. 먼저 pc2.png 시도, 실패하면 pc2.jpg 시도 -->
+            <img id="img-pc2" src="pc2.png" class="character-img" alt="Rival" 
+                 onerror="handleImageError(this, 'pc2')">
         </div>
 
         <!-- 말풍선 -->
@@ -388,9 +388,9 @@
         <!-- 케이크 -->
         <div class="cake-track">
             <div id="cake-obj" class="cake-obj">
-                <!-- 수정됨: cake.jpg -> cake.png -->
-                <img src="cake.png" style="width:100%; border-radius:10px; border:2px solid white; box-shadow:0 4px 8px rgba(0,0,0,0.3);" alt="Cake"
-                     onerror="this.src='https://placehold.co/100x100/8B4513/white?text=Cake';">
+                <!-- 1. 먼저 cake.png 시도, 실패하면 cake.jpg 시도 -->
+                <img id="img-cake" src="cake.png" style="width:100%; border-radius:10px; border:2px solid white; box-shadow:0 4px 8px rgba(0,0,0,0.3);" alt="Cake"
+                     onerror="handleImageError(this, 'cake')">
                 <div class="absolute -bottom-6 w-full text-center text-white font-bold drop-shadow-md">TARGET</div>
             </div>
         </div>
@@ -462,6 +462,49 @@
     </div>
 
     <script>
+        // 이미지 로딩 오류 처리기 (png 실패 -> jpg 시도 -> placeholder)
+        function handleImageError(img, name) {
+            // 이미 재시도했는지 확인 (무한 루프 방지)
+            if (img.dataset.retried === "true") {
+                // jpg도 실패하면 플레이스홀더 표시
+                let color = '808080';
+                if(name === 'pc1') color = 'FFB6C1';
+                if(name === 'pc2') color = 'ADD8E6';
+                if(name === 'cake') color = '8B4513';
+                img.src = `https://placehold.co/200x400/${color}/white?text=${name}`;
+                return;
+            }
+
+            // jpg로 확장자 변경해서 재시도
+            img.dataset.retried = "true";
+            img.src = name + ".jpg";
+            console.log(`Retrying ${name} with .jpg extension...`);
+        }
+
+        // 배경 이미지 로드 시도
+        function loadBackground() {
+            const gameScene = document.getElementById('game-scene');
+            const bgImg = new Image();
+            
+            // 먼저 png 시도
+            bgImg.onload = function() {
+                gameScene.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.png')`;
+            };
+            bgImg.onerror = function() {
+                // png 실패 시 jpg 시도
+                const bgImgJpg = new Image();
+                bgImgJpg.onload = function() {
+                     gameScene.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.jpg')`;
+                };
+                bgImgJpg.src = 'background.jpg';
+            };
+            bgImg.src = 'background.png';
+        }
+
+        // 초기 실행
+        window.addEventListener('load', loadBackground);
+
+
         // 게임 설정
         const MAX_HP = 100;
         const CAKE_MAX_POS = 100; // 0 = Player, 100 = Rival
